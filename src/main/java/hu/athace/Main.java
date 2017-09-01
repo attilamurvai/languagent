@@ -13,6 +13,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -21,6 +24,9 @@ import java.util.stream.Stream;
 public class Main extends Application {
     public static final String WORDS_FILE = "google-books-common-words.txt";
     public static final String DELIMITER = " ";
+    //    public static final String CHARSET = "UTF-8";
+    public static final String CHARSET = "ISO-8859-2";
+
     private TableView tableView;
     private Map<String, Long> globalWordCount;
     private Map<String, Integer> globalWordRank;
@@ -116,7 +122,6 @@ public class Main extends Application {
         globalWordRank = IntStream.range(0, list.size())
                 .boxed()
                 .collect(Collectors.toMap(i -> list.get(i), i -> i));
-        System.out.println();
 
     }
 
@@ -124,22 +129,23 @@ public class Main extends Application {
         Map<String, Integer> localWordCount = new HashMap<>();
 
         Set<String> rareWords = new HashSet<>();
-        try (Scanner s = new Scanner(new File(subtitlePath))) {
-            while (s.hasNext()) {
-                String next = s.next();
-                next = next.replaceAll("<.+>", "");
-                next = next.replaceAll("<.+", "");
-                next = next.replaceAll(".+>", "");
-//            next = next.replaceAll("[^A-za-z']", "");
-                next = next.replaceAll("[^A-za-z]+$", "");
-                if (!next.isEmpty()) {
-//                    String dictForm = next;
-//                    if (Character.isUpperCase(next.charAt(0)) && (next.length() == 1 || !Character.isUpperCase(next.charAt(1)))) {
-//                        dictForm = next.toLowerCase();
+        try (Stream<String> stream = Files.lines(Paths.get(subtitlePath), Charset.forName(CHARSET))) {
+            stream.forEach(line -> {
+                for (String word : line.split(" ")) {
+
+                    word = word.replaceAll("<.+>", "");
+                    word = word.replaceAll("<.+", "");
+                    word = word.replaceAll(".+>", "");
+//            word = word.replaceAll("[^A-za-z']", "");
+                    word = word.replaceAll("[^A-za-z]+$", "");
+                    if (!word.isEmpty()) {
+//                    String dictForm = word;
+//                    if (Character.isUpperCase(word.charAt(0)) && (word.length() == 1 || !Character.isUpperCase(word.charAt(1)))) {
+//                        dictForm = word.toLowerCase();
 //                    }
 
-                    int count = localWordCount.containsKey(next) ? localWordCount.get(next) : 0;
-                    localWordCount.put(next, count + 1);
+                        int count = localWordCount.containsKey(word) ? localWordCount.get(word) : 0;
+                        localWordCount.put(word, count + 1);
 
 //                    Long occurence = globalWordCount.get(dictForm.toLowerCase());
 //                    if (occurence == null) {
@@ -147,8 +153,11 @@ public class Main extends Application {
 //                    } else if (occurence < 5000000) {
 //                        rareWords.add(dictForm);
 //                    }
+                    }
                 }
-            }
+            });
+        } catch (Exception e) {
+            System.out.println(e);
         }
 
         getTable().getItems().clear();
