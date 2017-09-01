@@ -126,55 +126,40 @@ public class Main extends Application {
     }
 
     private void parseSubtitle(String subtitlePath) throws FileNotFoundException {
-        Map<String, Integer> localWordCount = new HashMap<>();
+        Map<Word, Integer> localWordCount = new HashMap<>();
 
-        Set<String> rareWords = new HashSet<>();
         try (Stream<String> stream = Files.lines(Paths.get(subtitlePath), Charset.forName(CHARSET))) {
             stream.forEach(line -> {
-                for (String word : line.split(" ")) {
+                for (String wordValue : line.split(" ")) {
 
-                    word = word.replaceAll("<.+>", "");
-                    word = word.replaceAll("<.+", "");
-                    word = word.replaceAll(".+>", "");
-//            word = word.replaceAll("[^A-za-z']", "");
-                    word = word.replaceAll("[^A-za-z]+$", "");
-                    if (!word.isEmpty()) {
-//                    String dictForm = word;
-//                    if (Character.isUpperCase(word.charAt(0)) && (word.length() == 1 || !Character.isUpperCase(word.charAt(1)))) {
-//                        dictForm = word.toLowerCase();
+                    wordValue = wordValue.replaceAll("<.+>", "");
+                    wordValue = wordValue.replaceAll("<.+", "");
+                    wordValue = wordValue.replaceAll(".+>", "");
+//            wordValue = wordValue.replaceAll("[^A-za-z']", "");
+                    wordValue = wordValue.replaceAll("[^A-za-z]+$", "");
+                    if (!wordValue.isEmpty()) {
+//                    String dictForm = wordValue;
+//                    if (Character.isUpperCase(wordValue.charAt(0)) && (wordValue.length() == 1 || !Character.isUpperCase(wordValue.charAt(1)))) {
+//                        dictForm = wordValue.toLowerCase();
 //                    }
 
+                        Word word = new Word(wordValue);
                         int count = localWordCount.containsKey(word) ? localWordCount.get(word) : 0;
                         localWordCount.put(word, count + 1);
 
-//                    Long occurence = globalWordCount.get(dictForm.toLowerCase());
-//                    if (occurence == null) {
-//
-//                    } else if (occurence < 5000000) {
-//                        rareWords.add(dictForm);
-//                    }
                     }
                 }
             });
         } catch (Exception e) {
-            System.out.println(e);
+            System.err.println(e.getStackTrace());
         }
 
         getTable().getItems().clear();
 
-        for (Iterator<Map.Entry<String, Integer>> it = localWordCount.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<String, Integer> entry = it.next();
-            String word = entry.getKey();
-            // if it exists with lower case, then it should be accumulated because probably it exists both ways
-            // because sometimes it is at the start of the sentence
-            if (!word.equals(word.toLowerCase()) && localWordCount.containsKey(word.toLowerCase())) {
-                localWordCount.put(word.toLowerCase(), localWordCount.get(word.toLowerCase()) + entry.getValue());
-                it.remove();
-            }
-        }
-
-        for (String word : localWordCount.keySet()) {
-            getTable().getItems().add(new RowItem(word, globalWordCount.get(word.toLowerCase()), globalWordRank.get(word.toLowerCase()), localWordCount.get(word)));
+        for (Word word : localWordCount.keySet()) {
+            String wordValue = word.value;
+            System.out.println(wordValue);
+            getTable().getItems().add(new RowItem(wordValue, globalWordCount.get(wordValue.toLowerCase()), globalWordRank.get(wordValue.toLowerCase()), localWordCount.get(word)));
         }
 
         TableColumnResizeHelper.autoFitTable(getTable());
