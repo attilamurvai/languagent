@@ -6,7 +6,7 @@ import java.util.Objects;
  * Entity class for the words. Current implementation is case insensitive.
  */
 public class Word {
-    String value;
+    final String value;
     String sentence;
     String fileName;
 

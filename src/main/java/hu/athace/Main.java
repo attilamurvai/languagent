@@ -1,12 +1,10 @@
 package hu.athace;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
@@ -50,44 +48,39 @@ public class Main extends Application {
 
         Scene scene = new Scene(root, 600, 600);
 
-        scene.setOnDragOver(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                Dragboard db = event.getDragboard();
-                if (db.hasFiles()) {
-                    event.acceptTransferModes(TransferMode.COPY);
-                } else {
-                    event.consume();
-                }
+        scene.setOnDragOver(event -> {
+            Dragboard db = event.getDragboard();
+            if (db.hasFiles()) {
+                event.acceptTransferModes(TransferMode.COPY);
+            } else {
+                event.consume();
             }
         });
 
-        scene.setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                Dragboard db = event.getDragboard();
-                boolean success = false;
-                if (db.hasFiles()) {
-                    success = true;
-                    String filePath = null;
-                    for (File file : db.getFiles()) {
-                        filePath = file.getAbsolutePath();
-                        try {
-                            String ext = filePath.substring(filePath.lastIndexOf('.') + 1);
-                            if (ext.toLowerCase().equals("srt")) {
-                                parseSubtitle(filePath);
-                            } else {
-                                System.err.println("Currently only SRT extension is supported!");
-                            }
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
+        scene.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+                String filePath;
+                for (File file : db.getFiles()) {
+                    filePath = file.getAbsolutePath();
+                    try {
+                        String ext = filePath.substring(filePath.lastIndexOf('.') + 1);
+                        if (ext.toLowerCase().equals("srt")) {
+                            Map<Word, Integer> wordIntegerMap = parseSubtitle(filePath);
+                            updateView(wordIntegerMap);
+                        } else {
+                            System.err.println("Currently only SRT extension is supported!");
                         }
-                        System.out.println(filePath);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                    System.out.println(filePath);
                 }
-                event.setDropCompleted(success);
-                event.consume();
             }
+            event.setDropCompleted(success);
+            event.consume();
         });
 
 
@@ -112,7 +105,6 @@ public class Main extends Application {
             );
         }
 
-
         // init global work rank from global word count
         List<String> list = globalWordCount.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
@@ -125,7 +117,7 @@ public class Main extends Application {
 
     }
 
-    private void parseSubtitle(String subtitlePath) throws FileNotFoundException {
+    private Map<Word, Integer> parseSubtitle(String subtitlePath) throws IOException {
         Map<Word, Integer> localWordCount = new HashMap<>();
 
         try (Stream<String> stream = Files.lines(Paths.get(subtitlePath), Charset.forName(CHARSET))) {
@@ -150,10 +142,12 @@ public class Main extends Application {
                     }
                 }
             });
-        } catch (Exception e) {
-            System.err.println(e.getStackTrace());
         }
 
+        return localWordCount;
+    }
+
+    private void updateView(Map<Word, Integer> localWordCount) {
         getTable().getItems().clear();
 
         for (Word word : localWordCount.keySet()) {
@@ -163,13 +157,6 @@ public class Main extends Application {
         }
 
         TableColumnResizeHelper.autoFitTable(getTable());
-
-//        Comparator<? super String> comparator = (Comparator<String>) (o1, o2) -> globalWordCount.get(o1.toLowerCase()) - globalWordCount.get(o2.toLowerCase()) < 0 ? -1 : 1;
-//        List<String> rareWordsSorted = rareWords.stream().sorted(comparator).collect(Collectors.toList());
-//
-
-//        getTable().getItems().addAll(rareWordsSorted);
-//        System.out.println(rareWordsSorted);
     }
 
 
