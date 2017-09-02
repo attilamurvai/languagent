@@ -1,4 +1,4 @@
-package hu.athace;
+package hu.athace.view;
 
 public class RowItem {
     private final String word;

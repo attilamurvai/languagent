@@ -1,4 +1,4 @@
-package hu.athace;
+package hu.athace.view;
 
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.control.TableColumn;
