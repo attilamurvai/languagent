@@ -1,11 +1,14 @@
 package hu.athace;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.BreakIterator;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,31 +28,60 @@ public class TextProcessor {
 
 
     public Map<Word, Integer> parseSubtitle(String subtitlePath) throws IOException {
+        Book book = new Book(subtitlePath);
+
         Map<Word, Integer> localWordCount = new HashMap<>();
 
         try (Stream<String> stream = Files.lines(Paths.get(subtitlePath), Charset.forName(CHARSET))) {
-            stream.forEach(line -> {
-                for (String wordValue : line.split(" ")) {
+            String text = stream.filter(line ->
+                    !(line.matches("")
+                            || line.matches("\\d+")
+                            || line.matches("\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}")))
+                    .collect(Collectors.joining(" "));
 
-                    wordValue = wordValue.replaceAll("<.+>", "");
-                    wordValue = wordValue.replaceAll("<.+", "");
-                    wordValue = wordValue.replaceAll(".+>", "");
+            // normalize, mainly to remove space duplicates
+            StringUtils.normalizeSpace(text);
+
+            // iterate without streams, because no breakiterator supported in streams
+            BreakIterator breakIterator = BreakIterator.getSentenceInstance();
+            breakIterator.setText(text);
+
+            int first = breakIterator.first();
+            int last = breakIterator.next();
+            String sentenceValue;
+            while (last != BreakIterator.DONE) {
+                sentenceValue = text.substring(first, last);
+                book.sentences.add(new Sentence(sentenceValue));
+                first = last;
+                last = breakIterator.next();
+            }
+        }
+
+        // go through the "book"
+        book.sentences.stream()
+//                .map(sentence -> sentence.value)
+                .forEach(sentence -> {
+                    String sentenceValue = sentence.value;
+                    for (String wordValue : sentenceValue.split(" ")) {
+
+                        wordValue = wordValue.replaceAll("<.+>", "");
+                        wordValue = wordValue.replaceAll("<.+", "");
+                        wordValue = wordValue.replaceAll(".+>", "");
 //            wordValue = wordValue.replaceAll("[^A-za-z']", "");
-                    wordValue = wordValue.replaceAll("[^A-za-z]+$", "");
-                    if (!wordValue.isEmpty()) {
+                        wordValue = wordValue.replaceAll("[^A-za-z]+$", "");
+                        if (!wordValue.isEmpty()) {
 //                    String dictForm = wordValue;
 //                    if (Character.isUpperCase(wordValue.charAt(0)) && (wordValue.length() == 1 || !Character.isUpperCase(wordValue.charAt(1)))) {
 //                        dictForm = wordValue.toLowerCase();
 //                    }
+                            Word word = new Word(wordValue, sentence);
 
-                        Word word = new Word(wordValue);
-                        int count = localWordCount.containsKey(word) ? localWordCount.get(word) : 0;
-                        localWordCount.put(word, count + 1);
+                            int count = localWordCount.containsKey(word) ? localWordCount.get(word) : 0;
+                            localWordCount.put(word, count + 1);
 
+                        }
                     }
-                }
-            });
-        }
+                });
 
         return localWordCount;
     }

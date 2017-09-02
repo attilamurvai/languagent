@@ -7,11 +7,16 @@ import java.util.Objects;
  */
 public class Word {
     final String value;
-    String sentence;
+    Sentence sentence;
     String fileName;
 
     public Word(String value) {
         this.value = value;
+    }
+
+    public Word(String value, Sentence sentence) {
+        this(value);
+        this.sentence = sentence;
     }
 
     @Override

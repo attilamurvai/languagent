@@ -4,7 +4,9 @@ import hu.athace.view.RowItem;
 import hu.athace.view.TableColumnResizeHelper;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -19,7 +21,7 @@ public class Controller {
     private final TextProcessor processor;
 
     private Stage stage;
-    private TableView tableView;
+    private TableView<RowItem> tableView;
 
     public Controller(Stage primaryStage) {
         stage = primaryStage;
@@ -58,6 +60,7 @@ public class Controller {
                 String filePath;
                 for (File file : db.getFiles()) {
                     filePath = file.getAbsolutePath();
+                    System.out.println("Processing file at path: " + filePath);
                     try {
                         String ext = filePath.substring(filePath.lastIndexOf('.') + 1);
                         if (ext.toLowerCase().equals("srt")) {
@@ -69,7 +72,6 @@ public class Controller {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    System.out.println(filePath);
                 }
             }
             event.setDropCompleted(success);
@@ -95,11 +97,17 @@ public class Controller {
 
     public TableView getTable() {
         if (tableView == null) {
-            tableView = new TableView();
+            tableView = new TableView<>();
 
-            TableColumn column1 = new TableColumn("Word");
+            TableColumn column1 = new TableColumn<>("Word");
             column1.setCellValueFactory(
-                    new PropertyValueFactory<RowItem, String>("word"));
+                    new PropertyValueFactory<>("word"));
+//            Callback<TableColumn<RowItem, String>, TableCell<RowItem, String>> cellFactory = column1.getCellFactory();
+//            column1.setCellFactory(param -> {
+//                TableCell<RowItem, String> cell = cellFactory.call(param);
+//                cell.setTooltip(new Tooltip("blam"));
+//                return cell;
+//            });
             tableView.getColumns().add(column1);
 
             TableColumn column2 = new TableColumn("Global count");
@@ -116,6 +124,15 @@ public class Controller {
             column4.setCellValueFactory(
                     new PropertyValueFactory<RowItem, Integer>("localCount"));
             tableView.getColumns().add(column4);
+
+            tableView.setRowFactory((TableView<RowItem> param) -> new TableRow<RowItem>() {
+                @Override
+                protected void updateItem(RowItem item, boolean empty) {
+                    super.updateItem(item, empty);
+                    // todo bind to word's sentence property
+                    setTooltip(new Tooltip("placeholder"));
+                }
+            });
         }
         return tableView;
     }
