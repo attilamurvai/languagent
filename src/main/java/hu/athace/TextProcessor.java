@@ -27,10 +27,8 @@ public class TextProcessor {
     public Map<String, Integer> globalWordRank;
 
 
-    public Map<Word, Integer> parseSubtitle(String subtitlePath) throws IOException {
+    public Book parseSubtitle(String subtitlePath) throws IOException {
         Book book = new Book(subtitlePath);
-
-        Map<Word, Integer> localWordCount = new HashMap<>();
 
         try (Stream<String> stream = Files.lines(Paths.get(subtitlePath), Charset.forName(CHARSET))) {
             String text = stream.filter(line ->
@@ -51,39 +49,48 @@ public class TextProcessor {
             String sentenceValue;
             while (last != BreakIterator.DONE) {
                 sentenceValue = text.substring(first, last);
-                book.sentences.add(new Sentence(sentenceValue));
+                book.getSentences().add(new Sentence(sentenceValue));
                 first = last;
                 last = breakIterator.next();
             }
         }
 
         // go through the "book"
-        book.sentences.stream()
+        book.getSentences().stream()
 //                .map(sentence -> sentence.value)
                 .forEach(sentence -> {
-                    String sentenceValue = sentence.value;
+                    String sentenceValue = sentence.getValue();
                     for (String wordValue : sentenceValue.split(" ")) {
 
+                        // todo revise these replaces
                         wordValue = wordValue.replaceAll("<.+>", "");
                         wordValue = wordValue.replaceAll("<.+", "");
                         wordValue = wordValue.replaceAll(".+>", "");
 //            wordValue = wordValue.replaceAll("[^A-za-z']", "");
                         wordValue = wordValue.replaceAll("[^A-za-z]+$", "");
                         if (!wordValue.isEmpty()) {
-//                    String dictForm = wordValue;
-//                    if (Character.isUpperCase(wordValue.charAt(0)) && (wordValue.length() == 1 || !Character.isUpperCase(wordValue.charAt(1)))) {
-//                        dictForm = wordValue.toLowerCase();
-//                    }
-                            Word word = new Word(wordValue, sentence);
 
-                            int count = localWordCount.containsKey(word) ? localWordCount.get(word) : 0;
-                            localWordCount.put(word, count + 1);
-
+                            // map the words to lowercase keys to be able to merge words with upper and lower cases
+                            String lowerCaseWordValue = wordValue.toLowerCase();
+                            Word word = book.getWordMap().get(lowerCaseWordValue);
+                            if (word == null) {
+                                word = new Word(wordValue);
+                                book.getWordMap().put(lowerCaseWordValue, word);
+                            } else {
+                                // if the word already exists with an uppercase value and we find the same word with lowercase, set it to lowercase
+                                // (the existing values are most probably coming from the beginning of sentences)
+                                String existingWordValue = word.getValue();
+                                if (!existingWordValue.equals(existingWordValue.toLowerCase()) && wordValue.equals(existingWordValue.toLowerCase())) {
+                                    word.setValue(wordValue);
+                                }
+                            }
+                            // add the new sentence to the word
+                            word.getSentences().add(sentence);
                         }
                     }
                 });
 
-        return localWordCount;
+        return book;
     }
 
     public void initDictionary() {

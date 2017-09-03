@@ -1,7 +1,8 @@
 package hu.athace;
 
-import hu.athace.view.RowItem;
 import hu.athace.view.TableColumnResizeHelper;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -15,13 +16,12 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 public class Controller {
     private final TextProcessor processor;
 
     private Stage stage;
-    private TableView<RowItem> tableView;
+    private TableView<Word> tableView;
 
     public Controller(Stage primaryStage) {
         stage = primaryStage;
@@ -64,8 +64,8 @@ public class Controller {
                     try {
                         String ext = filePath.substring(filePath.lastIndexOf('.') + 1);
                         if (ext.toLowerCase().equals("srt")) {
-                            Map<Word, Integer> wordIntegerMap = processor.parseSubtitle(filePath);
-                            updateView(wordIntegerMap);
+                            Book book = processor.parseSubtitle(filePath);
+                            updateView(book);
                         } else {
                             System.err.println("Currently only SRT extension is supported!");
                         }
@@ -83,13 +83,11 @@ public class Controller {
         primaryStage.show();
     }
 
-    private void updateView(Map<Word, Integer> localWordCount) {
+    private void updateView(Book book) {
         getTable().getItems().clear();
 
-        for (Word word : localWordCount.keySet()) {
-            String wordValue = word.value;
-            System.out.println(wordValue);
-            getTable().getItems().add(new RowItem(wordValue, processor.globalWordCount.get(wordValue.toLowerCase()), processor.globalWordRank.get(wordValue.toLowerCase()), localWordCount.get(word)));
+        for (Word word : book.getWordMap().values()) {
+            getTable().getItems().add(word);
         }
 
         TableColumnResizeHelper.autoFitTable(getTable());
@@ -99,38 +97,44 @@ public class Controller {
         if (tableView == null) {
             tableView = new TableView<>();
 
-            TableColumn column1 = new TableColumn<>("Word");
+            TableColumn<Word, String> column1 = new TableColumn<>("Word");
             column1.setCellValueFactory(
-                    new PropertyValueFactory<>("word"));
-//            Callback<TableColumn<RowItem, String>, TableCell<RowItem, String>> cellFactory = column1.getCellFactory();
-//            column1.setCellFactory(param -> {
-//                TableCell<RowItem, String> cell = cellFactory.call(param);
-//                cell.setTooltip(new Tooltip("blam"));
-//                return cell;
-//            });
+                    new PropertyValueFactory<>("value"));
             tableView.getColumns().add(column1);
 
-            TableColumn column2 = new TableColumn("Global count");
+            TableColumn<Word, Long> column2 = new TableColumn("Global count");
             column2.setCellValueFactory(
-                    new PropertyValueFactory<RowItem, Long>("globalCount"));
+                    param -> {
+                        Long count = processor.globalWordCount.get(param.getValue().getValue().toLowerCase());
+                        if (count == null) {
+                            count = 0l;
+                        }
+                        return new SimpleLongProperty(count).asObject();
+                    });
             tableView.getColumns().add(column2);
 
-            TableColumn column3 = new TableColumn("Global rank");
+            TableColumn<Word, Integer> column3 = new TableColumn("Global rank");
             column3.setCellValueFactory(
-                    new PropertyValueFactory<RowItem, Long>("globalRank"));
+                    param -> {
+                        Integer rank = processor.globalWordRank.get(param.getValue().getValue().toLowerCase());
+                        if (rank == null) {
+                            rank = 0;
+                        }
+                        return new SimpleIntegerProperty(rank).asObject();
+                    });
             tableView.getColumns().add(column3);
 
-            TableColumn column4 = new TableColumn("Local count");
-            column4.setCellValueFactory(
-                    new PropertyValueFactory<RowItem, Integer>("localCount"));
+            TableColumn<Word, Integer> column4 = new TableColumn("Local count");
+            column4.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getSentences().size()).asObject());
             tableView.getColumns().add(column4);
 
-            tableView.setRowFactory((TableView<RowItem> param) -> new TableRow<RowItem>() {
+            tableView.setRowFactory(param -> new TableRow<Word>() {
                 @Override
-                protected void updateItem(RowItem item, boolean empty) {
+                protected void updateItem(Word item, boolean empty) {
                     super.updateItem(item, empty);
-                    // todo bind to word's sentence property
-                    setTooltip(new Tooltip("placeholder"));
+                    if (item != null) {
+                        setTooltip(new Tooltip(item.getSentences().get(0).getValue()));
+                    }
                 }
             });
         }

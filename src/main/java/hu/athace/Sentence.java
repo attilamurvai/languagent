@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sentence {
-    String value;
-    List<Word> words = new ArrayList<>();
+    private final String value;
 
     public Sentence(String value) {
         this.value = value;
+    }
+
+    public String getValue() {
+        return value;
     }
 }
