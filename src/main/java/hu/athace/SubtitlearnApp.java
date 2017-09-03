@@ -1,25 +1,9 @@
 package hu.athace;
 
-import hu.athace.view.RowItem;
-import hu.athace.view.TableColumnResizeHelper;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.io.IOException;
 
 public class SubtitlearnApp extends Application {
     // TODO extract to config file

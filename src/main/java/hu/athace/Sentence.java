@@ -1,9 +1,6 @@
 package hu.athace;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Sentence {
+class Sentence {
     private final String value;
 
     public Sentence(String value) {

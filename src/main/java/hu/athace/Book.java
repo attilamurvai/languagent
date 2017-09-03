@@ -1,6 +1,9 @@
 package hu.athace;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Book {
     private final String name;
@@ -9,6 +12,10 @@ public class Book {
 
     public Book(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public List<Sentence> getSentences() {

@@ -17,10 +17,10 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 
-public class Controller {
+class Controller {
     private final TextProcessor processor;
 
-    private Stage stage;
+    private final Stage stage;
     private TableView<Word> tableView;
 
     public Controller(Stage primaryStage) {
@@ -93,7 +93,7 @@ public class Controller {
         TableColumnResizeHelper.autoFitTable(getTable());
     }
 
-    public TableView getTable() {
+    private TableView<Word> getTable() {
         if (tableView == null) {
             tableView = new TableView<>();
 
@@ -102,18 +102,18 @@ public class Controller {
                     new PropertyValueFactory<>("value"));
             tableView.getColumns().add(column1);
 
-            TableColumn<Word, Long> column2 = new TableColumn("Global count");
+            TableColumn<Word, Long> column2 = new TableColumn<>("Global count");
             column2.setCellValueFactory(
                     param -> {
                         Long count = processor.globalWordCount.get(param.getValue().getValue().toLowerCase());
                         if (count == null) {
-                            count = 0l;
+                            count = 0L;
                         }
                         return new SimpleLongProperty(count).asObject();
                     });
             tableView.getColumns().add(column2);
 
-            TableColumn<Word, Integer> column3 = new TableColumn("Global rank");
+            TableColumn<Word, Integer> column3 = new TableColumn<>("Global rank");
             column3.setCellValueFactory(
                     param -> {
                         Integer rank = processor.globalWordRank.get(param.getValue().getValue().toLowerCase());
@@ -124,7 +124,7 @@ public class Controller {
                     });
             tableView.getColumns().add(column3);
 
-            TableColumn<Word, Integer> column4 = new TableColumn("Local count");
+            TableColumn<Word, Integer> column4 = new TableColumn<>("Local count");
             column4.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getSentences().size()).asObject());
             tableView.getColumns().add(column4);
 

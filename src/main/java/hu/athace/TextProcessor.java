@@ -20,8 +20,8 @@ import java.util.stream.Stream;
 import static hu.athace.SubtitlearnApp.CHARSET;
 import static hu.athace.SubtitlearnApp.WORDS_FILE;
 
-public class TextProcessor {
-    public static final String DELIMITER = " ";
+class TextProcessor {
+    private static final String DELIMITER = " ";
 
     public Map<String, Long> globalWordCount;
     public Map<String, Integer> globalWordRank;
@@ -56,7 +56,7 @@ public class TextProcessor {
         }
 
         // go through the "book"
-        book.getSentences().stream()
+        book.getSentences()
 //                .map(sentence -> sentence.value)
                 .forEach(sentence -> {
                     String sentenceValue = sentence.getValue();
@@ -118,7 +118,7 @@ public class TextProcessor {
 
         globalWordRank = IntStream.range(0, list.size())
                 .boxed()
-                .collect(Collectors.toMap(i -> list.get(i), i -> i));
+                .collect(Collectors.toMap(list::get, i -> i));
 
     }
 }
