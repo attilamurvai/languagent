@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Entity class for the words. Current implementation is case insensitive.
  */
-class Word {
+public class Word {
     private String value;
     private final List<Sentence> sentences = new ArrayList<>();
 
