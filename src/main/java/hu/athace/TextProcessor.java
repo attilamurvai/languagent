@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.BreakIterator;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -93,7 +92,7 @@ class TextProcessor {
         return book;
     }
 
-    public void initDictionary() {
+    public void initDictionary() throws IOException {
         //        Path path = Paths.get(filePath);
 //        Stream<String> stream = Files.lines(path);
 
@@ -103,11 +102,10 @@ class TextProcessor {
 //                .collect(Collectors.toMap(k -> k.split(" ")[0], v -> v.split(" ")[1]));
 
         // init global word count
-        globalWordCount = new HashMap<>();
-        try (Stream<String> lines = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream(WORDS_FILE))).lines()) {
-            lines.filter(line -> line.contains(DELIMITER)).forEach(
-                    line -> globalWordCount.putIfAbsent(line.split(DELIMITER)[0], Long.parseLong(line.split(DELIMITER)[1]))
-            );
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream(WORDS_FILE)))) {
+            globalWordCount = bufferedReader.lines().filter(line -> line.contains(DELIMITER))
+                    .collect(Collectors.toMap(k -> k.split(DELIMITER)[0], v -> Long.parseLong(v.split(DELIMITER)[1])));
+
         }
 
         // init global work rank from global word count

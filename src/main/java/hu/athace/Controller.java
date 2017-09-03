@@ -30,7 +30,12 @@ class Controller {
     }
 
     public void init() {
-        processor.initDictionary();
+        // todo maybe handle somewhere else
+        try {
+            processor.initDictionary();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         initStage(stage);
     }
 
