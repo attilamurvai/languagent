@@ -3,11 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>hu.athace</groupId>
-    <artifactId>subtitlearn</artifactId>
+    <artifactId>languagent</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>server</module>
+        <module>client</module>
+    </modules>
+    <packaging>pom</packaging>
 
-    <name>subtitlearn</name>
+    <name>LanguAgent Parent</name>
     <url>http://maven.apache.org</url>
 
     <properties>
