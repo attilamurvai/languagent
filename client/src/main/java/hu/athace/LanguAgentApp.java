@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class SubtitlearnApp extends Application {
+public class LanguAgentApp extends Application {
     // TODO extract to config file
     public static final String WORDS_FILE = "google-books-common-words.txt";
     //    public static final String CHARSET = "UTF-8";

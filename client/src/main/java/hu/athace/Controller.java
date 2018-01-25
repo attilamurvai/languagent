@@ -40,7 +40,7 @@ class Controller {
     }
 
     private void initStage(Stage primaryStage) {
-        primaryStage.setTitle("Subtitlearn");
+        primaryStage.setTitle("LanguAgent");
 
         StackPane root = new StackPane();
 

@@ -29,7 +29,7 @@
                             <!--
                             <addClasspath>true</addClasspath>
                             -->
-                            <mainClass>hu.athace.SubtitlearnApp</mainClass>
+                            <mainClass>hu.athace.LanguAgentApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -39,7 +39,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>8.8.3</version>
                 <configuration>
-                    <mainClass>hu.athace.SubtitlearnApp</mainClass>
+                    <mainClass>hu.athace.LanguAgentApp</mainClass>
                     <!-- todo: something is required here but is this correct? -->
                     <vendor>hu.athace</vendor>
                 </configuration>

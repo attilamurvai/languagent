@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static hu.athace.SubtitlearnApp.CHARSET;
-import static hu.athace.SubtitlearnApp.WORDS_FILE;
+import static hu.athace.LanguAgentApp.CHARSET;
+import static hu.athace.LanguAgentApp.WORDS_FILE;
 
 class TextProcessor {
     private static final String DELIMITER = " ";
