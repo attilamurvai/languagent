@@ -1,4 +1,4 @@
-package hu.athace;
+package hu.athace.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

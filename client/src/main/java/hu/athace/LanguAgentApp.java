@@ -1,26 +1,29 @@
 package hu.athace;
 
+import hu.athace.business.Constants;
+import hu.athace.business.LocalTextProcessor;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class LanguAgentApp extends Application {
-    // TODO extract to config file
-    public static final String WORDS_FILE = "google-books-common-words.txt";
-    //    public static final String CHARSET = "UTF-8";
-    public static final String CHARSET = "ISO-8859-2";
 
     private Controller controller;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        controller = new Controller(primaryStage);
-        controller.init();
+    public void start(Stage primaryStage) throws IOException {
+        if (Constants.RUN_WITHOUT_SERVER) {
+            LocalTextProcessor textProcessor = new LocalTextProcessor();
+            controller = new Controller(primaryStage, textProcessor);
+            controller.init();
+        } else {
+            // todo: implement rest service call
+        }
     }
 
 

@@ -25,3 +25,7 @@ web.xml
 -------
 
 <virtual-host> ?
+
+-------
+
+maven - bind wildfly:deploy to install phase?

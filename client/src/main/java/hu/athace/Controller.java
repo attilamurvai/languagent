@@ -1,5 +1,9 @@
 package hu.athace;
 
+import hu.athace.model.Dictionary;
+import hu.athace.business.TextProcessor;
+import hu.athace.model.Book;
+import hu.athace.model.Word;
 import hu.athace.view.TableColumnResizeHelper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -18,24 +22,20 @@ import java.io.File;
 import java.io.IOException;
 
 class Controller {
-    private final TextProcessor processor;
+    private final TextProcessor textProcessor;
 
     private final Stage stage;
     private TableView<Word> tableView;
+    private Dictionary dictionary;
 
-    public Controller(Stage primaryStage) {
+    public Controller(Stage primaryStage, TextProcessor textProcessor) {
         stage = primaryStage;
-        processor = new TextProcessor();
-
+        this.textProcessor = textProcessor;
     }
 
-    public void init() {
-        // todo maybe handle somewhere else
-        try {
-            processor.initDictionary();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void init() throws IOException {
+        // todo: think about the ideal way and responsibilites of initializing this class
+        dictionary = textProcessor.readDictionary();
         initStage(stage);
     }
 
@@ -69,7 +69,7 @@ class Controller {
                     try {
                         String ext = filePath.substring(filePath.lastIndexOf('.') + 1);
                         if (ext.toLowerCase().equals("srt")) {
-                            Book book = processor.parseSubtitle(filePath);
+                            Book book = textProcessor.parseSubtitle(filePath);
                             updateView(book);
                         } else {
                             System.err.println("Currently only SRT extension is supported!");
@@ -110,7 +110,7 @@ class Controller {
             TableColumn<Word, Long> column2 = new TableColumn<>("Global count");
             column2.setCellValueFactory(
                     param -> {
-                        Long count = processor.globalWordCount.get(param.getValue().getValue().toLowerCase());
+                        Long count = dictionary.globalWordCount.get(param.getValue().getValue().toLowerCase());
                         if (count == null) {
                             count = 0L;
                         }
@@ -121,7 +121,7 @@ class Controller {
             TableColumn<Word, Integer> column3 = new TableColumn<>("Global rank");
             column3.setCellValueFactory(
                     param -> {
-                        Integer rank = processor.globalWordRank.get(param.getValue().getValue().toLowerCase());
+                        Integer rank = dictionary.globalWordRank.get(param.getValue().getValue().toLowerCase());
                         if (rank == null) {
                             rank = 0;
                         }

@@ -1,5 +1,9 @@
-package hu.athace;
+package hu.athace.business;
 
+import hu.athace.model.Book;
+import hu.athace.model.Dictionary;
+import hu.athace.model.Sentence;
+import hu.athace.model.Word;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -16,15 +20,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static hu.athace.LanguAgentApp.CHARSET;
-import static hu.athace.LanguAgentApp.WORDS_FILE;
+import static hu.athace.business.Constants.CHARSET;
+import static hu.athace.business.Constants.WORDS_FILE;
 
-class TextProcessor {
+public class LocalTextProcessor implements TextProcessor {
     private static final String DELIMITER = " ";
-
-    public Map<String, Long> globalWordCount;
-    public Map<String, Integer> globalWordRank;
-
 
     public Book parseSubtitle(String subtitlePath) throws IOException {
         Book book = new Book(subtitlePath);
@@ -92,7 +92,8 @@ class TextProcessor {
         return book;
     }
 
-    public void initDictionary() throws IOException {
+    public Dictionary readDictionary() throws IOException {
+        Dictionary dictionary = new Dictionary();
         //        Path path = Paths.get(filePath);
 //        Stream<String> stream = Files.lines(path);
 
@@ -103,20 +104,21 @@ class TextProcessor {
 
         // init global word count
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream(WORDS_FILE)))) {
-            globalWordCount = bufferedReader.lines().filter(line -> line.contains(DELIMITER))
+            dictionary.globalWordCount = bufferedReader.lines().filter(line -> line.contains(DELIMITER))
                     .collect(Collectors.toMap(k -> k.split(DELIMITER)[0], v -> Long.parseLong(v.split(DELIMITER)[1])));
 
         }
 
         // init global work rank from global word count
-        List<String> list = globalWordCount.entrySet().stream()
+        List<String> list = dictionary.globalWordCount.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        globalWordRank = IntStream.range(0, list.size())
+        dictionary.globalWordRank = IntStream.range(0, list.size())
                 .boxed()
                 .collect(Collectors.toMap(list::get, i -> i));
 
+        return dictionary;
     }
 }

@@ -1,6 +1,6 @@
-package hu.athace;
+package hu.athace.model;
 
-class Sentence {
+public class Sentence {
     private final String value;
 
     public Sentence(String value) {
