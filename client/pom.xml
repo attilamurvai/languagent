@@ -67,6 +67,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>hu.athace</groupId>
+            <artifactId>languagent-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.zenjava</groupId>
             <artifactId>javafx-maven-plugin</artifactId>
             <version>8.8.3</version>

@@ -6,6 +6,7 @@
     <artifactId>languagent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
+        <module>common</module><!-- todo: should this be here? other modules depend on it anyways -->
         <module>server</module>
         <module>client</module>
     </modules>

@@ -1,8 +1,8 @@
 package hu.athace;
 
-import hu.athace.model.Dictionary;
 import hu.athace.business.TextProcessor;
 import hu.athace.model.Book;
+import hu.athace.model.Dictionary;
 import hu.athace.model.Word;
 import hu.athace.view.TableColumnResizeHelper;
 import javafx.beans.property.SimpleIntegerProperty;
