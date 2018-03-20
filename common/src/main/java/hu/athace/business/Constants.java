@@ -7,8 +7,6 @@ public class Constants {
     //    public static final String CHARSET = "UTF-8";
     public static final String CHARSET = "ISO-8859-2";
 
-    public static final boolean RUN_WITHOUT_SERVER = true;
-
     private Constants() {
         // restrict instantiation
     }

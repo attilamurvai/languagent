@@ -20,16 +20,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static hu.athace.business.Constants.CHARSET;
-import static hu.athace.business.Constants.WORDS_FILE;
-
-public class LocalTextProcessor implements TextProcessor {
+public class TextProcessorImpl implements TextProcessor {
     private static final String DELIMITER = " ";
 
     public Book parseSubtitle(String subtitlePath) throws IOException {
         Book book = new Book(subtitlePath);
 
-        try (Stream<String> stream = Files.lines(Paths.get(subtitlePath), Charset.forName(CHARSET))) {
+        try (Stream<String> stream = Files.lines(Paths.get(subtitlePath), Charset.forName(Constants.CHARSET))) {
             String text = stream.filter(line ->
                     !(line.matches("")
                             || line.matches("\\d+")
@@ -103,7 +100,7 @@ public class LocalTextProcessor implements TextProcessor {
 //                .collect(Collectors.toMap(k -> k.split(" ")[0], v -> v.split(" ")[1]));
 
         // init global word count
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream(WORDS_FILE)))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream(Constants.WORDS_FILE)))) {
             dictionary.globalWordCount = bufferedReader.lines().filter(line -> line.contains(DELIMITER))
                     .collect(Collectors.toMap(k -> k.split(DELIMITER)[0], v -> Long.parseLong(v.split(DELIMITER)[1])));
 

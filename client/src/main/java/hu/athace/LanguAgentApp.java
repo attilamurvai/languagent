@@ -1,7 +1,6 @@
 package hu.athace;
 
-import hu.athace.business.Constants;
-import hu.athace.business.LocalTextProcessor;
+import hu.athace.business.TextProcessorImpl;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -18,7 +17,7 @@ public class LanguAgentApp extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         if (Constants.RUN_WITHOUT_SERVER) {
-            LocalTextProcessor textProcessor = new LocalTextProcessor();
+            TextProcessorImpl textProcessor = new TextProcessorImpl();
             controller = new Controller(primaryStage, textProcessor);
             controller.init();
         } else {
