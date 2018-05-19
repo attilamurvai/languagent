@@ -178,22 +178,26 @@ public class GmailReader {
 
     public static String getContent(Message message) {
         StringBuilder stringBuilder = new StringBuilder();
-        getPlainTextFromMessageParts(message.getPayload().getParts(), stringBuilder);
 
-        return StringUtils.newStringUtf8(Base64.getUrlDecoder().decode(stringBuilder.toString()));
+        String text;
+        getPlainTextFromMessagePart(message.getPayload(), stringBuilder);
+        text = StringUtils.newStringUtf8(Base64.getUrlDecoder().decode(stringBuilder.toString()));
+
+        return text;
     }
 
 
     // todo check if the recursive method is necessary or the relevant plain text is always in the same messagepart
     // todo the method structure/signature might be temporary
-    private static void getPlainTextFromMessageParts(List<MessagePart> messageParts, StringBuilder stringBuilder) {
-        for (MessagePart messagePart : messageParts) {
-            if (messagePart.getMimeType().equals("text/plain")) {
-                stringBuilder.append(messagePart.getBody().getData());
-            }
+    private static void getPlainTextFromMessagePart(MessagePart messagePart, StringBuilder stringBuilder) {
+        if (messagePart.getMimeType().equals("text/plain")) {
+            stringBuilder.append(messagePart.getBody().getData());
+        }
 
-            if (messagePart.getParts() != null) {
-                getPlainTextFromMessageParts(messagePart.getParts(), stringBuilder);
+        List<MessagePart> messageParts = messagePart.getParts();
+        if (messageParts != null) {
+            for (MessagePart subPart : messageParts) {
+                getPlainTextFromMessagePart(subPart, stringBuilder);
             }
         }
     }
