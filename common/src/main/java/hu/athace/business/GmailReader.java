@@ -178,12 +178,8 @@ public class GmailReader {
 
     public static String getContent(Message message) {
         StringBuilder stringBuilder = new StringBuilder();
-
-        String text;
         getPlainTextFromMessagePart(message.getPayload(), stringBuilder);
-        text = StringUtils.newStringUtf8(Base64.getUrlDecoder().decode(stringBuilder.toString()));
-
-        return text;
+        return StringUtils.newStringUtf8(Base64.getUrlDecoder().decode(stringBuilder.toString()));
     }
 
 
