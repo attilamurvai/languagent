@@ -128,7 +128,7 @@ public class GmailReader {
         } else {
             System.out.println("Labels:");
             for (Label label : labels) {
-                System.out.printf("- %s\n", label.getName());
+                System.out.printf("- %s - %s\n", label.getName(), label.getId());
             }
         }
     }
@@ -179,13 +179,21 @@ public class GmailReader {
     public static String getContent(Message message) {
         StringBuilder stringBuilder = new StringBuilder();
         getPlainTextFromMessagePart(message.getPayload(), stringBuilder);
-        return StringUtils.newStringUtf8(Base64.getUrlDecoder().decode(stringBuilder.toString()));
+        String content;
+        try {
+            content = StringUtils.newStringUtf8(Base64.getUrlDecoder().decode(stringBuilder.toString()));
+        } catch (IllegalArgumentException e) { // todo prio1 fix these cases!! (they happen because base64 strings can not be simply concatenated!)
+            content = "";
+        }
+        return content;
     }
 
 
-    // todo check if the recursive method is necessary or the relevant plain text is always in the same messagepart
     // todo the method structure/signature might be temporary
+    // todo check if the recursive method is necessary or the relevant plain text is always in the same messagepart
+    // todo prio1 concatenation is not a good idea!!
     private static void getPlainTextFromMessagePart(MessagePart messagePart, StringBuilder stringBuilder) {
+        // todo prio1 not only text/plain should be read
         if (messagePart.getMimeType().equals("text/plain")) {
             stringBuilder.append(messagePart.getBody().getData());
         }
